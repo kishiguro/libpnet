@@ -13,11 +13,10 @@ extern crate libc;
 extern crate pnet_base;
 extern crate pnet_sys;
 
+use ipnetwork::IpNetwork;
 use std::io;
 use std::option::Option;
 use std::time::Duration;
-
-use ipnetwork::IpNetwork;
 
 pub use pnet_base::{MacAddr, ParseMacAddrErr};
 
@@ -30,24 +29,20 @@ mod backend;
 #[cfg(windows)]
 pub mod winpcap;
 
-#[cfg(all(not(feature = "netmap"),
-          any(target_os = "linux",
-              target_os = "android"
-             )
-         )
-      )]
+#[cfg(all(
+    not(feature = "netmap"),
+    any(target_os = "linux", target_os = "android")
+))]
 #[path = "linux.rs"]
 mod backend;
 
 #[cfg(any(target_os = "linux", target_os = "android"))]
 pub mod linux;
 
-#[cfg(all(not(feature = "netmap"),
-          any(target_os = "freebsd",
-              target_os = "openbsd",
-              target_os = "macos")
-             )
-     )]
+#[cfg(all(
+    not(feature = "netmap"),
+    any(target_os = "freebsd", target_os = "openbsd", target_os = "macos")
+))]
 #[path = "bpf.rs"]
 mod backend;
 
@@ -230,7 +225,7 @@ impl NetworkInterface {
     pub fn mac_address(&self) -> MacAddr {
         self.mac.unwrap()
     }
-    
+
     pub fn is_up(&self) -> bool {
         self.flags & (pnet_sys::IFF_UP as u32) != 0
     }
@@ -250,7 +245,7 @@ impl NetworkInterface {
 }
 
 impl ::std::fmt::Display for NetworkInterface {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
         const FLAGS: [&'static str; 5] =
             ["UP", "BROADCAST", "LOOPBACK", "POINTOPOINT", "MULTICAST"];
         let flags = if self.flags > 0 {
@@ -265,7 +260,7 @@ impl ::std::fmt::Display for NetworkInterface {
                 "{:X}<{}>",
                 self.flags,
                 rets.iter()
-                    .zip(FLAGS.iter()) 
+                    .zip(FLAGS.iter())
                     .filter(|&(ret, _)| ret == &true)
                     .map(|(_, name)| name.to_string())
                     .collect::<Vec<String>>()
@@ -275,7 +270,8 @@ impl ::std::fmt::Display for NetworkInterface {
             format!("{:X}", self.flags)
         };
 
-        let mac = self.mac
+        let mac = self
+            .mac
             .map(|mac| mac.to_string())
             .unwrap_or("N/A".to_owned());
         let ips = if self.ips.len() > 0 {
