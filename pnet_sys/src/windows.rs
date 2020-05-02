@@ -23,6 +23,7 @@ pub mod public {
     pub type BufLen = ctypes::c_int;
     pub type CouldFail = ctypes::c_int;
     pub type SockLen = ctypes::c_int;
+    pub type MutSockLen = *mut ctypes::c_int;
     pub type SockAddr = ws2def::SOCKADDR;
     pub type SockAddrIn = ws2def::SOCKADDR_IN;
     pub type SockAddrIn6 = ws2ipdef::SOCKADDR_IN6;
@@ -62,7 +63,7 @@ pub mod public {
         level: ctypes::c_int,
         name: ctypes::c_int,
         value: Buf,
-        option_len: SockLen,
+        option_len: MutSockLen,
     ) -> ctypes::c_int {
         winsock2::setsockopt(socket, level, name, value, option_len)
     }
