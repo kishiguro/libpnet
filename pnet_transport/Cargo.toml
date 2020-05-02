@@ -10,7 +10,7 @@ keywords = ["networking", "transport", "raw", "socket"]
 categories = ["network-programming"]
 
 [dependencies]
-libc = "0.2.39"
+libc = "0.2.69"
 pnet_base = "0.25.0"
 pnet_sys = { path = "../pnet_sys", version = "0.25.0" }
 pnet_packet = { path = "../pnet_packet", version = "0.25.0" }
