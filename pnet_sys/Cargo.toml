@@ -13,4 +13,5 @@ categories = ["network-programming"]
 libc = "0.2.69"
 
 [target.'cfg(windows)'.dependencies]
-winapi = { git = "https://github.com/mattlknight/winapi-rs", branch = "iphlpapi", features = ["impl-default", "in6addr", "inaddr", "minwindef", "winerror", "winsock2", "ws2def", "ws2ipdef"] }
+winapi = "0.3.8"
+#winapi = { git = "https://github.com/mattlknight/winapi-rs", branch = "iphlpapi", features = ["impl-default", "in6addr", "inaddr", "minwindef", "winerror", "winsock2", "ws2def", "ws2ipdef"] }

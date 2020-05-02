@@ -22,4 +22,5 @@ pcap = { version = "0.7", optional = true }
 netmap_sys = { version = ">=0.0", optional = true, features = ["netmap_with_libs"] }
 
 [target.'cfg(windows)'.dependencies]
-winapi = { git = "https://github.com/mattlknight/winapi-rs", branch = "iphlpapi", features = ["guiddef", "in6addr", "inaddr", "iptypes", "minwinbase", "minwindef", "winerror", "winnt", "winsock2", "ws2def", "ws2ipdef"] }
+winapi = "0.3.8"
+# winapi = { git = "https://github.com/mattlknight/winapi-rs", branch = "iphlpapi", features = ["guiddef", "in6addr", "inaddr", "iptypes", "minwinbase", "minwindef", "winerror", "winnt", "winsock2", "ws2def", "ws2ipdef"] }
