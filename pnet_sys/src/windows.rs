@@ -150,7 +150,7 @@ pub mod public {
         level: libc::c_int,
         name: libc::c_int,
         value: MutBuf,
-        option_len: MutSockLen,
+        option_len: SockLen,
     ) -> libc::c_int {
         winsock2::getsockopt(socket, level, name, value, option_len)
     }
