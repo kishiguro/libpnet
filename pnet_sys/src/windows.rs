@@ -26,7 +26,7 @@ pub mod public {
     pub type MutSockLen = *mut ctypes::c_int;
     pub type SockAddr = ws2def::SOCKADDR;
     pub type SockAddrIn = ws2def::SOCKADDR_IN;
-    pub type SockAddrIn6 = ws2ipdef::SOCKADDR_IN6;
+    pub type SockAddrIn6 = ws2ipdef::SOCKADDR_IN6_LH;
     pub type SockAddrStorage = ws2def::SOCKADDR_STORAGE;
     pub type SockAddrFamily = ws2def::ADDRESS_FAMILY;
     pub type SockAddrFamily6 = ws2def::ADDRESS_FAMILY;
@@ -68,6 +68,23 @@ pub mod public {
         winsock2::setsockopt(socket, level, name, value, option_len)
     }
 
+    pub fn make_in6_addr(segments: [u16; 8]) -> In6Addr {
+        let mut val: In6Addr = unsafe { mem::uninitialized() };
+        unsafe {
+            *val.u.Word_mut() = [
+                htons(segments[0]),
+                htons(segments[1]),
+                htons(segments[2]),
+                htons(segments[3]),
+                htons(segments[4]),
+                htons(segments[5]),
+                htons(segments[6]),
+                htons(segments[7]),
+            ];
+        }
+        val
+    }
+
     pub fn addr_to_sockaddr(addr: SocketAddr, storage: &mut SockAddrStorage) -> SockLen {
         unsafe {
             let len = match addr {
@@ -89,7 +106,7 @@ pub mod public {
                 SocketAddr::V6(sa) => {
                     let ip_addr = sa.ip();
                     let segments = ip_addr.segments();
-                    let inaddr = super::make_in6_addr(segments);
+                    let inaddr = make_in6_addr(segments);
                     let storage = storage as *mut _ as *mut SockAddrIn6;
                     (*storage).sin6_family = AF_INET6 as SockAddrFamily6;
                     (*storage).sin6_port = htons(addr.port());
@@ -159,6 +176,8 @@ pub mod public {
 
 use self::public::*;
 
+use std::mem;
+
 #[inline(always)]
 pub fn ipv4_addr(addr: InAddr) -> u32 {
     unsafe { (*addr.S_un.S_addr() as u32).to_be() }
@@ -166,7 +185,7 @@ pub fn ipv4_addr(addr: InAddr) -> u32 {
 
 #[inline(always)]
 pub fn mk_inaddr(addr: u32) -> InAddr {
-    let mut val = InAddr::default();
+    let mut val: InAddr = unsafe { mem::uninitialized() };
     unsafe {
         *val.S_un.S_addr_mut() = addr as minwindef::ULONG;
     }
@@ -193,35 +212,6 @@ pub unsafe fn recvfrom(
     addrlen: *mut SockLen,
 ) -> CouldFail {
     winsock2::recvfrom(socket, buf, len, flags, addr, addrlen)
-}
-
-pub fn make_in6_addr(segments: [u16; 8]) -> In6Addr {
-    let mut val = In6Addr::default();
-    unsafe {
-        *val.u.Word_mut() = [
-            htons(segments[0]),
-            htons(segments[1]),
-            htons(segments[2]),
-            htons(segments[3]),
-            htons(segments[4]),
-            htons(segments[5]),
-            htons(segments[6]),
-            htons(segments[7]),
-        ];
-    }
-
-    // val = unsafe {
-    //
-    // mem::transmute([htons(segments[0]),
-    //                 htons(segments[1]),
-    //                 htons(segments[2]),
-    //                 htons(segments[3]),
-    //                 htons(segments[4]),
-    //                 htons(segments[5]),
-    //                 htons(segments[6]),
-    //                 htons(segments[7])])
-    // };
-    val
 }
 
 #[inline]
